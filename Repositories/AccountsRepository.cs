@@ -17,6 +17,7 @@ namespace expense_tracker.Repositories
         Task DeleteAccountById(int id);
         Task CreateAccount(string name, decimal startingBalance, int accountTypeId);
         Task<IEnumerable<AccountType>> GetAccountTypes();
+        Task UpdateAccountById(int id, string name, decimal startingBalance, int accountTypeId);
     }
 
     public class AccountsRepository : IAccountsRepository
@@ -72,6 +73,19 @@ namespace expense_tracker.Repositories
         public Task<IEnumerable<AccountType>> GetAccountTypes()
         {
             return _databaseAccessor.QueryMultipleProcedureAsync<AccountType>("sp_SelectAccountTypes");
+        }
+
+        public Task UpdateAccountById(int id, string name, decimal startingBalance, int accountTypeId)
+        {
+            var parameters = new
+            {
+                Id = id,
+                Name = name,
+                StartingBalance = startingBalance,
+                AccountTypeId = accountTypeId
+            };
+
+            return _databaseAccessor.ExecuteProcedureAsync("sp_UpdateAccount_ById", parameters);
         }
     }
 }

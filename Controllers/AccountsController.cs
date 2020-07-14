@@ -59,8 +59,10 @@ namespace expense_tracker.Controllers
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<IActionResult> Put(int id, [FromBody]UpdateAccountRequest request)
         {
+            await _accountsService.UpdateAccountById(id, request);
+            return Ok();
         }
 
         // DELETE api/<controller>/5

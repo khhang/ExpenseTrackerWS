@@ -16,6 +16,7 @@ namespace expense_tracker.Logic
         Task DeleteAccountById(int id);
         Task CreateAccount(CreateAccountRequest request);
         Task<IEnumerable<AccountType>> GetAccountTypes();
+        Task UpdateAccountById(int id, UpdateAccountRequest request);
     }
 
     public class AccountsService : IAccountsService
@@ -51,9 +52,14 @@ namespace expense_tracker.Logic
             await _accountsRepository.CreateAccount(request.Name, request.StartingBalance, request.AccountTypeId);
         }
 
-        public Task<IEnumerable<AccountType>> GetAccountTypes()
+        public async Task<IEnumerable<AccountType>> GetAccountTypes()
         {
-            return _accountsRepository.GetAccountTypes();
+            return await _accountsRepository.GetAccountTypes();
+        }
+
+        public async Task UpdateAccountById(int id, UpdateAccountRequest request)
+        {
+            await _accountsRepository.UpdateAccountById(id, request.Name, request.StartingBalance, request.AccountTypeId);
         }
     }
 }
