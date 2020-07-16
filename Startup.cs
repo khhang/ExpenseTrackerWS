@@ -1,17 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using expense_tracker.Logic;
 using expense_tracker.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace expense_tracker
 {
@@ -42,6 +36,10 @@ namespace expense_tracker
             services
                 .AddSingleton<IAccountsService, AccountsService>()
                 .AddSingleton<IAccountsRepository, AccountsRepository>()
+                .AddSingleton<ICategoriesService, CategoriesService>()
+                .AddSingleton<ICategoriesRepository, CategoriesRepository>()
+                .AddSingleton<ISubcategoriesService, SubcategoriesService>()
+                .AddSingleton<ISubcategoriesRepository, SubcategoriesRepository>()
                 .AddSingleton(CreateDatabaseAccessor);
 
             services.AddControllers();
