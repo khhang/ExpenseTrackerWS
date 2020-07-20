@@ -42,6 +42,8 @@ namespace expense_tracker
                 .AddSingleton<ISubcategoriesRepository, SubcategoriesRepository>()
                 .AddSingleton<IIncomeCategoriesService, IncomeCategoriesService>()
                 .AddSingleton<IIncomeCategoriesRepository, IncomeCategoriesRepository>()
+                .AddSingleton<IExpensesService, ExpensesService>()
+                .AddSingleton<IExpensesRepository, ExpensesRepository>()
                 .AddSingleton(CreateDatabaseAccessor);
 
             services.AddControllers();
