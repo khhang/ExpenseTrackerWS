@@ -49,7 +49,9 @@ namespace expense_tracker.Repositories
                     foreach (var property in typeof(T).GetProperties())
                     {
                         var convertTo = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
-                        property.SetValue(item, Convert.ChangeType(reader[property.Name], convertTo), null);
+                        var sqlValue = reader[property.Name];
+                        property.SetValue(item,
+                            DBNull.Value.Equals(sqlValue) ? null : Convert.ChangeType(sqlValue, convertTo));
                     }
                     results.Add(item);
                 }
