@@ -1,11 +1,14 @@
 using System;
+using System.Text;
 using expense_tracker.Logic;
 using expense_tracker.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace expense_tracker
 {
@@ -33,6 +36,26 @@ namespace expense_tracker
                             .AllowAnyMethod();
                     });
             });
+
+            var key = "test key for auth";
+
+            services.AddAuthentication(x => 
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x => 
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
             services
                 .AddSingleton<IAccountsService, AccountsService>()
                 .AddSingleton<IAccountsRepository, AccountsRepository>()
@@ -44,6 +67,8 @@ namespace expense_tracker
                 .AddSingleton<IIncomeCategoriesRepository, IncomeCategoriesRepository>()
                 .AddSingleton<IExpensesService, ExpensesService>()
                 .AddSingleton<IExpensesRepository, ExpensesRepository>()
+                .AddSingleton<ITransfersRepository, TransfersRepository>()
+                .AddSingleton<IJwtAuthenticationManager>(new JwtAuthenticationManager(key))
                 .AddSingleton(CreateDatabaseAccessor);
 
             services.AddControllers();
@@ -70,6 +95,7 @@ namespace expense_tracker
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

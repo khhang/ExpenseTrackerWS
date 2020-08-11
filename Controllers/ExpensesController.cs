@@ -21,7 +21,7 @@ namespace expense_tracker.Controllers
             _expensesService = expensesService;
         }
 
-        [HttpGet]
+        [HttpGet("details")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IEnumerable<ExpenseDetail>> GetExpenseDetails()
         {

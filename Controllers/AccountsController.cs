@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using expense_tracker.Domain.Models;
 using expense_tracker.Domain.Requests.Accounts;
 using expense_tracker.Logic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace expense_tracker.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class AccountsController : ControllerBase
     {
