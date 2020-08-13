@@ -6,43 +6,51 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using expense_tracker.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace expense_tracker.Logic
 {
     public interface IJwtAuthenticationManager
     {
-        string Authenticate(string username, string password);
+        Task<string> Authenticate(string username, string password);
     }
 
     public class JwtAuthenticationManager : IJwtAuthenticationManager
     {
-        private readonly IDictionary<string, string> users = new Dictionary<string, string> {
-            { "test1", "password1" },
-            { "test2", "password2" }
-        };
-        private readonly string _key;
+        private readonly IUsersRepository _usersRepository;
+        private readonly IConfiguration _configuration;
 
-        public JwtAuthenticationManager(string key)
+        public JwtAuthenticationManager(
+            IConfiguration configuration, 
+            IUsersRepository usersRepository)
         {
-            _key = key;
+            _configuration = configuration;
+            _usersRepository = usersRepository;
         }
 
-        public string Authenticate(string username, string password)
+        public async Task<string> Authenticate(string username, string password)
         {
-            if(!users.Any(u => u.Key == username && u.Value == password))
+            var user = (await _usersRepository.SearchUser(username)).FirstOrDefault();
+
+            if (user == null || user.PasswordHash != UserHelper.GetHashedPassword(password + user.Salt, password))
             {
                 return null;
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenKey = Encoding.ASCII.GetBytes(_key);
+            var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             { 
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Issuer"],
+                IssuedAt = DateTime.UtcNow,
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, username)
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim("UserId", user.Id.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(tokenKey),
                     SecurityAlgorithms.HmacSha256Signature)

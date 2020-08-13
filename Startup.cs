@@ -37,8 +37,6 @@ namespace expense_tracker
                     });
             });
 
-            var key = "test key for auth";
-
             services.AddAuthentication(x => 
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,9 +48,12 @@ namespace expense_tracker
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["Jwt:Key"])),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidAudience = Configuration["Jwt:Issuer"],
                 };
             });
 
@@ -68,7 +69,9 @@ namespace expense_tracker
                 .AddSingleton<IExpensesService, ExpensesService>()
                 .AddSingleton<IExpensesRepository, ExpensesRepository>()
                 .AddSingleton<ITransfersRepository, TransfersRepository>()
-                .AddSingleton<IJwtAuthenticationManager>(new JwtAuthenticationManager(key))
+                .AddSingleton<IJwtAuthenticationManager, JwtAuthenticationManager>()
+                .AddSingleton<IUsersService, UsersService>()
+                .AddSingleton<IUsersRepository, UsersRepository>()
                 .AddSingleton(CreateDatabaseAccessor);
 
             services.AddControllers();
