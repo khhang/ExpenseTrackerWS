@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using expense_tracker.Domain.Responses;
 using expense_tracker.Infrastructure;
 using expense_tracker.Logic;
 using Microsoft.AspNetCore.Authorization;
@@ -54,7 +55,9 @@ namespace expense_tracker.Controllers
                 return Unauthorized();
             }
             
-            return Ok(token);
+            return Ok(new TokenResponse {
+                Token = token
+            });
         }
     }
 }
